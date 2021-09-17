@@ -7,16 +7,24 @@ const Trip = require("./models/trip");
 const Ticket = require("./models/ticket");
 const Payment = require("./models/payment");
 const dotenv=require('dotenv').config();
+const path=require('path')
 
 //Instantiations
 var jsonParser = bodyParser.json();
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'build')));
+
+
+app.get('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 //Database connection
 const dbURI =process.env.DBURI;
 mongoose
   .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then((result) => app.listen(process.env.PORT))
+  .then((result) => app.listen(process.env.PORT || 4000))
   .catch((err) => console.log(err));
 
 //To make frontend call backend
@@ -29,7 +37,10 @@ app.use(function (req, res, next) {
   next();
 });
 
-
+//Return all trips
+app.get("/", (req, res) => {
+    res.send('<h1>Hello</h1>');
+});
 
 app.post("/create", jsonParser, (req, res) => {
   //If any data is missing
